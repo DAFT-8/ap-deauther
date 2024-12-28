@@ -5,7 +5,8 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-command -v aircrack-ng > /dev/null 2>&1 || { echo >&2 "I require iw but it's not installed. Install it. Aborting."; exit 1; }
+command -v aircrack-ng > /dev/null 2>&1 || { echo >&2 "I require aircrack-ng but it's not installed. Install it. Aborting."; exit 1; }
+command -v iw > /dev/null 2>&1 || { echo >&2 "I require iw but it's not installed. Install it. Aborting."; exit 1; }
 
 usage() {
   echo "Usage: $0 IFACE"
@@ -18,6 +19,8 @@ if [ "$#" -ne 1 ]; then
 fi
 
 IFACE="$1"
+
+iw dev $IFACE set power_save off
 
 deauth() {
   echo -n "Enter target MAC address (e.g. FF:FF:FF:FF:FF:FF): "
