@@ -32,7 +32,7 @@ deauth() {
   trap "trap 'airmon-ng stop $IFACE; exit 1' SIGINT SIGTERM SIGHUP SIGQUIT; aireplay-ng --deauth 0 -a $MAC $IFACE" SIGINT SIGTERM SIGHUP SIGQUIT
 
   iwconfig $IFACE channel $CH
-  airodump-ng --bssid $MAC --channel $CH $IFACE
+  airodump-ng --bssid "$MAC" --channel $CH $IFACE
 }
 
 trap deauth SIGINT SIGTERM SIGHUP SIGQUIT
